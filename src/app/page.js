@@ -20,49 +20,51 @@ export default function Home() {
   }, [user, isLibrarian, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100">
-      <div className="max-w-4xl mx-auto px-4 text-center">
-        <h1 className="text-5xl font-bold text-gray-900 mb-6">
-          Welcome to Library Management System
-        </h1>
-        <p className="text-xl text-gray-700 mb-8">
-          Discover, reserve, and manage your favorite books all in one place
-        </p>
-        
-        <div className="flex justify-center space-x-4">
-          <Link
-            href="/login"
-            className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg text-lg font-medium transition-colors"
-          >
-            Login
-          </Link>
-          <Link
-            href="/signup"
-            className="bg-white hover:bg-gray-50 text-primary-600 border-2 border-primary-600 px-8 py-3 rounded-lg text-lg font-medium transition-colors"
-          >
-            Sign Up
-          </Link>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-primary-100 px-4">
+      <div className="max-w-6xl w-full text-center">
+        <div className="mb-12">
+          <h1 className="text-5xl font-extrabold text-primary-800 mb-4">
+            Welcome to Library Management System
+          </h1>
+          <p className="text-xl text-gray-700 mb-8">
+            Discover, reserve, and manage your favorite books all in one place
+          </p>
+
+          <div className="flex flex-col md:flex-row justify-center gap-4">
+            <Link
+              href="/login"
+              className="px-8 py-3 rounded-lg bg-primary-800 hover:bg-primary-700 text-white font-medium shadow-lg transition-all duration-200"
+            >
+              Login
+            </Link>
+            <Link
+              href="/signup"
+              className="px-8 py-3 rounded-lg border-2 border-primary-600 text-primary-600 hover:bg-primary-50 font-medium shadow transition-all duration-200"
+            >
+              Sign Up
+            </Link>
+          </div>
         </div>
 
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="text-4xl mb-4">📚</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300">
+            <div className="text-5xl mb-4">📚</div>
             <h3 className="text-xl font-semibold mb-2">Browse Books</h3>
             <p className="text-gray-600">
               Explore our extensive collection of books across various genres
             </p>
           </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="text-4xl mb-4">🔖</div>
+
+          <div className="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300">
+            <div className="text-5xl mb-4">🔖</div>
             <h3 className="text-xl font-semibold mb-2">Easy Reservations</h3>
             <p className="text-gray-600">
               Reserve books for 7, 14, or 21 days with just a few clicks
             </p>
           </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="text-4xl mb-4">👤</div>
+
+          <div className="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300">
+            <div className="text-5xl mb-4">👤</div>
             <h3 className="text-xl font-semibold mb-2">Manage Your Library</h3>
             <p className="text-gray-600">
               Track your reservations and reading history
