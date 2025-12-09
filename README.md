@@ -151,3 +151,4 @@ For support, email sheharasiriwardana21@Gmail.com or open an issue in the reposi
 ---
 
 **Note**: This is a learning project developed as part of a full-stack development course. Ensure the backend API and API Gateway are running before starting the frontend application.
+
