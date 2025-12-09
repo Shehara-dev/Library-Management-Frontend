@@ -12,7 +12,7 @@ export function AuthProvider({ children }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is logged in on mount
+    // Check if user is logged in on mount (reads from localStorage)
     const currentUser = authService.getCurrentUser();
     setUser(currentUser);
     setLoading(false);
@@ -21,7 +21,16 @@ export function AuthProvider({ children }) {
   const login = async (credentials) => {
     try {
       const data = await authService.login(credentials);
-      setUser({ email: data.email, role: data.role });
+      
+      // FIX: Ensure we capture the ID from the response
+      // We check for 'userId' (backend usually sends this) or 'id'
+      const userId = data.userId || data.id;
+
+      setUser({ 
+        id: userId, 
+        email: data.email, 
+        role: data.role 
+      }); 
       
       // Redirect based on role
       if (data.role === 'LIBRARIAN') {
@@ -32,6 +41,7 @@ export function AuthProvider({ children }) {
       
       return { success: true };
     } catch (error) {
+      console.error("Login Error:", error);
       return { 
         success: false, 
         error: error.response?.data || 'Login failed' 

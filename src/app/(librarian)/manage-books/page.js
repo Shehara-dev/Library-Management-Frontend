@@ -62,6 +62,7 @@ export default function ManageBooksPage() {
   };
 
   const handleOpenModal = (book = null) => {
+    setMessage({ type: '', text: '' }); // Clear messages
     if (book) {
       setEditingBook(book);
       setFormData({
@@ -134,15 +135,27 @@ export default function ManageBooksPage() {
     }
   };
 
+  // --- UPDATED DELETE FUNCTION ---
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this book?')) return;
 
     try {
       await bookService.deleteBook(id);
       setMessage({ type: 'success', text: 'Book deleted successfully!' });
-      fetchBooks();
+      // Remove book from local state immediately
+      setBooks(books.filter(b => b.id !== id));
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to delete book' });
+      console.error("Delete failed:", error);
+      
+      // Check for Foreign Key Constraint Error (400 Bad Request)
+      if (error.response && error.response.status === 400) {
+        setMessage({ 
+          type: 'error', 
+          text: 'Cannot delete: This book has active reservations or history. Please change its status to RESERVED or ARCHIVED instead.' 
+        });
+      } else {
+        setMessage({ type: 'error', text: 'Failed to delete book' });
+      }
     }
   };
 
