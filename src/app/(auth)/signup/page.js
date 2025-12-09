@@ -5,58 +5,75 @@ import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+// 1. Imports for shadcn form & validation
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+// 2. Define Validation Schema
+const formSchema = z.object({
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters.",
+  }),
+  confirmPassword: z.string(),
+  role: z.string().default("USER"), // Default role
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match.",
+  path: ["confirmPassword"], // Error will appear under confirmPassword field
+});
+
 export default function SignupPage() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: 'USER',
-  });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [globalError, setGlobalError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
   const router = useRouter();
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  // 3. Initialize Form Hook
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+      role: "USER",
+    },
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+  // 4. Handle Submit
+  const onSubmit = async (values) => {
+    setGlobalError('');
     setLoading(true);
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match.');
-      setLoading(false);
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters.');
-      setLoading(false);
-      return;
-    }
 
     try {
       const result = await signup({
-        email: formData.email,
-        password: formData.password,
-        role: formData.role,
+        email: values.email,
+        password: values.password,
+        role: values.role,
       });
 
       if (result.success) {
         setSuccess(true);
         setTimeout(() => router.push('/login'), 2000);
       } else {
-        setError(result.error || 'Signup failed. Please try again.');
+        setGlobalError(result.error || 'Signup failed. Please try again.');
       }
-    } catch {
-      setError('An unexpected error occurred. Please try again.');
+    } catch (err) {
+      setGlobalError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -72,102 +89,90 @@ export default function SignupPage() {
           </p>
         </div>
 
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg text-sm text-center shadow-sm">
-              {error}
-            </div>
-          )}
+        {/* 5. Shadcn Form Wrapper */}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            
+            {/* Success Message */}
+            {success && (
+              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded-lg text-sm text-center shadow-sm">
+                 Account created successfully! Redirecting...
+              </div>
+            )}
 
-          {success && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded-lg text-sm text-center shadow-sm">
-               Account created successfully!
-            </div>
-          )}
+            {/* Error Message */}
+            {globalError && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg text-sm text-center shadow-sm">
+                {globalError}
+              </div>
+            )}
 
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
-              </label>
-              <input
-                id="email"
+            <div className="space-y-4">
+              {/* Email Field */}
+              <FormField
+                control={form.control}
                 name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
-                placeholder="you@example.com"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="you@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                id="password"
+              {/* Password Field */}
+              <FormField
+                control={form.control}
                 name="password"
-                type="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
-                placeholder="At least 6 characters"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="At least 6 characters" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm Password
-              </label>
-              <input
-                id="confirmPassword"
+              {/* Confirm Password Field */}
+              <FormField
+                control={form.control}
                 name="confirmPassword"
-                type="password"
-                required
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
-                placeholder="Repeat password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Repeat password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
 
-            {/*<div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
-                Account Type
-              </label>
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
-              >
-                <option value="USER">User (Member)</option>
-                <option value="LIBRARIAN">Librarian (Admin)</option>
-              </select>
-            </div>*/}
-          </div>
+            <Button 
+              type="submit" 
+              className="w-full py-2.5 bg-primary-800 hover:bg-primary-700 shadow-md"
+              disabled={loading || success}
+            >
+              {loading ? 'Creating Account...' : 'Sign Up'}
+            </Button>
 
-          <button
-            type="submit"
-            disabled={loading || success}
-            className="w-full py-2.5 px-4 bg-primary-800 hover:bg-primary-700 text-white font-medium rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Creating Account...' : 'Sign Up'}
-          </button>
+            <div className="text-center text-sm text-gray-600">
+              <p className="mt-3">
+                Already have an account?{' '}
+                <Link href="/login" className="font-medium text-primary-600 hover:text-primary-700">
+                  Sign in
+                </Link>
+              </p>
+            </div>
 
-          <div className="text-center text-sm text-gray-600">
-            <p className="mt-3">
-              Already have an account?{' '}
-              <Link href="/login" className="font-medium text-primary-600 hover:text-primary-700">
-                Sign in
-              </Link>
-            </p>
-          </div>
-        </form>
+          </form>
+        </Form>
       </div>
     </div>
   );

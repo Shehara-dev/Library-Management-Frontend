@@ -8,6 +8,17 @@ import Loading from '@/components/Loading';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
+// 1. Import Shadcn UI Components
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 export default function BooksPage() {
   const [books, setBooks] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -51,10 +62,19 @@ export default function BooksPage() {
     }
   };
 
+  // Standard handler for Text Inputs
   const handleFilterChange = (e) => {
     setFilters({
       ...filters,
       [e.target.name]: e.target.value
+    });
+  };
+
+  // Special handler for Shadcn Select (returns value directly, not event)
+  const handleCategoryChange = (value) => {
+    setFilters({
+      ...filters,
+      category: value === "all" ? "" : value // Handle "all" case
     });
   };
 
@@ -86,7 +106,8 @@ export default function BooksPage() {
       genre: '',
       language: ''
     });
-    fetchBooks();
+    // We can also trigger a refetch immediately
+    fetchBooks(); 
   };
 
   if (!user) return null;
@@ -96,95 +117,102 @@ export default function BooksPage() {
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Browse Books</h1>
 
-      {/* Filters */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+      {/* Filters Container */}
+      <div className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
         <h2 className="text-lg font-semibold mb-4">Filter Books</h2>
+        
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+          
+          {/* Category Select */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Category
             </label>
-            <select
-              name="category"
-              value={filters.category}
-              onChange={handleFilterChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+            <Select 
+              value={filters.category || "all"} 
+              onValueChange={handleCategoryChange}
             >
-              <option value="">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.name}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.name}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+          {/* Author Input */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium leading-none">
               Author
             </label>
-            <input
+            <Input
               type="text"
               name="author"
               value={filters.author}
               onChange={handleFilterChange}
               placeholder="Search by author"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+          {/* Genre Input */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium leading-none">
               Genre
             </label>
-            <input
+            <Input
               type="text"
               name="genre"
               value={filters.genre}
               onChange={handleFilterChange}
               placeholder="Search by genre"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+          {/* Language Input */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium leading-none">
               Language
             </label>
-            <input
+            <Input
               type="text"
               name="language"
               value={filters.language}
               onChange={handleFilterChange}
               placeholder="Search by language"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
         </div>
 
-        <div className="flex space-x-4 mt-4">
-          <button
+        {/* Action Buttons */}
+        <div className="flex space-x-4 mt-6">
+          <Button 
             onClick={applyFilters}
-            className="bg-primary-700 hover:bg-primary-700 text-white px-6 py-2 rounded-md font-medium"
+            className="bg-primary-700 hover:bg-primary-800"
           >
             Apply Filters
-          </button>
-          <button
+          </Button>
+          
+          <Button 
+            variant="outline" 
             onClick={clearFilters}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md font-medium"
           >
             Clear Filters
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Books Grid */}
       {books.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12">
-  <p className="text-red-600 text-xl font-bold">No books found</p>
-  <p className="text-gray-500 mt-2">Please try searching again or check.</p>
-</div>
-
+        <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+          <p className="text-gray-900 text-xl font-semibold">No books found</p>
+          <p className="text-gray-500 mt-2">Try adjusting your filters or search criteria.</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {books.map((book) => (

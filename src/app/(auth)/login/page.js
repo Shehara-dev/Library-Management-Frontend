@@ -5,29 +5,60 @@ import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+// 1. Imports for shadcn form & validation
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+import { Button } from "@/components/ui/button"; // Ensure you have this
+import { Input } from "@/components/ui/input";   // Ensure you have this
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"; // This points to the file you pasted earlier
+
+// 2. Define your validation schema
+const formSchema = z.object({
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+  password: z.string().min(1, {
+    message: "Password is required.",
+  }),
+});
+
 export default function LoginPage() {
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
+  const [globalError, setGlobalError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  // 3. Initialize the form hook
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+  // 4. Handle Submit
+  const onSubmit = async (values) => {
+    setGlobalError('');
     setLoading(true);
 
     try {
-      const result = await login(formData);
+      // 'values' automatically contains { email, password }
+      const result = await login(values);
       if (!result.success) {
-        setError(result.error || 'Login failed. Please check your credentials.');
+        setGlobalError(result.error || 'Login failed. Please check your credentials.');
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setGlobalError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -39,69 +70,72 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-blue-900 mb-2">Login</h1>
           <p className="text-gray-600 text-sm">
-            Access your library dashboard or explore books
+            Access your library  or explore books
           </p>
         </div>
 
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg text-sm text-center shadow-sm">
-              {error}
-            </div>
-          )}
+        {/* 5. The Shadcn Form Wrapper */}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            
+            {/* Global Error Message (e.g. Invalid credentials from server) */}
+            {globalError && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg text-sm text-center shadow-sm">
+                {globalError}
+              </div>
+            )}
 
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
-              </label>
-              <input
-                id="email"
+            <div className="space-y-4">
+              {/* Email Field */}
+              <FormField
+                control={form.control}
                 name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
-                placeholder="you@example.com"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="enter your email address" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                id="password"
+              {/* Password Field */}
+              <FormField
+                control={form.control}
                 name="password"
-                type="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
-                placeholder="••••••••"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-          </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 px-4 bg-primary-800 hover:bg-primary-700 text-white font-medium rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
+            <Button 
+              type="submit" 
+              className="w-full bg-primary-800 hover:bg-primary-700" 
+              disabled={loading}
+            >
+              {loading ? 'Signing in...' : 'Sign in'}
+            </Button>
 
-          <div className="text-center text-sm text-gray-600">
-            <p className="mt-3">
-              Don't have an account?{' '}
-              <Link href="/signup" className="font-medium text-primary-600 hover:text-primary-700">
-                Create
-              </Link>
-            </p>
-          </div>
+            <div className="text-center text-sm text-gray-600">
+              <p className="mt-3">
+                Don't have an account?{' '}
+                <Link href="/signup" className="font-medium text-primary-600 hover:text-primary-700">
+                  Create
+                </Link>
+              </p>
+            </div>
 
-        </form>
+          </form>
+        </Form>
       </div>
     </div>
   );
