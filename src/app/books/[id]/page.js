@@ -42,19 +42,30 @@ export default function BookDetailPage() {
     }
   };
 
-  const handleReserve = async () => {
+const handleReserve = async () => {
     try {
+      // 1. DEBUG: Check what the user object actually looks like
+      console.log("Current User Object:", user);
+
+      // 2. SAFETY CHECK: Stop if user or user.id is missing
+      if (!user || !user.id) {
+        console.error("User ID is missing!");
+        setMessage({ 
+          type: 'error', 
+          text: 'User profile not fully loaded. Please refresh the page or log in again.' 
+        });
+        return;
+      }
+
       setReserving(true);
       setMessage({ type: '', text: '' });
 
-      // Get user ID from stored user data
-      const currentUser = authService.getCurrentUser();
-      
+      // 3. Send the request with the validated ID
       await reservationService.createReservation({
-  userId: user.id,  // Now using actual user ID
-  bookId: book.id,
-  days: selectedDays
-});
+        userId: user.id, 
+        bookId: book.id,
+        days: selectedDays
+      });
 
       setMessage({ type: 'success', text: 'Book reserved successfully!' });
       setShowReserveModal(false);
@@ -65,7 +76,9 @@ export default function BookDetailPage() {
       setTimeout(() => {
         router.push('/reservations');
       }, 2000);
+
     } catch (error) {
+      console.error("Reservation Error:", error);
       setMessage({ 
         type: 'error', 
         text: error.response?.data || 'Failed to reserve book. Please try again.' 

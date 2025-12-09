@@ -10,28 +10,38 @@ export default function ReservationsPage() {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ type: '', text: '' });
+  
+  // Destructure user and isLibrarian from context
   const { user, isLibrarian } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
+    // 1. Guard: If user is not logged in, redirect
     if (!user) {
       router.push('/login');
       return;
     }
+
+    // 2. Guard: If user is a librarian, redirect
     if (isLibrarian) {
       router.push('/dashboard');
       return;
     }
-    fetchReservations();
-  }, [user, isLibrarian]);
 
-  const fetchReservations = async () => {
+    // 3. Fix: Only fetch if we have a valid User ID
+    // This prevents the "403 /user/undefined" error
+    if (user.id) {
+      fetchReservations(user.id);
+    }
+  }, [user, isLibrarian]); // Re-runs whenever 'user' updates (e.g. when ID loads)
+
+  // Update function to accept userId as an argument
+  const fetchReservations = async (userId) => {
     try {
       setLoading(true);
-      // Note: You'll need to get the actual user ID from your backend
-      // For now, we'll use a placeholder. You might need to adjust your backend
-      // to return user ID during login
-      const data = await reservationService.getUserReservations(user.id);
+      
+      // Use the userId passed from useEffect
+      const data = await reservationService.getUserReservations(userId);
       setReservations(data);
     } catch (error) {
       console.error('Failed to fetch reservations:', error);
@@ -47,13 +57,20 @@ export default function ReservationsPage() {
     try {
       await reservationService.returnBook(reservationId);
       setMessage({ type: 'success', text: 'Book returned successfully!' });
-      fetchReservations();
+      
+      // Refresh the list using the current user.id
+      if (user && user.id) {
+          fetchReservations(user.id);
+      }
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to return book' });
     }
   };
 
+  // While checking auth status, show nothing or loading
   if (!user || isLibrarian) return null;
+  
+  // While fetching data, show Loading component
   if (loading) return <Loading />;
 
   return (
