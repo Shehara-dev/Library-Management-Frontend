@@ -11,36 +11,34 @@ export default function ReservationsPage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ type: '', text: '' });
   
-  // Destructure user and isLibrarian from context
+  
   const { user, isLibrarian } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    // 1. Guard: If user is not logged in, redirect
+    
     if (!user) {
       router.push('/login');
       return;
     }
 
-    // 2. Guard: If user is a librarian, redirect
+    
     if (isLibrarian) {
       router.push('/dashboard');
       return;
     }
 
-    // 3. Fix: Only fetch if we have a valid User ID
-    // This prevents the "403 /user/undefined" error
+    
     if (user.id) {
       fetchReservations(user.id);
     }
-  }, [user, isLibrarian]); // Re-runs whenever 'user' updates (e.g. when ID loads)
+  }, [user, isLibrarian]); 
 
-  // Update function to accept userId as an argument
-  const fetchReservations = async (userId) => {
+    const fetchReservations = async (userId) => {
     try {
       setLoading(true);
       
-      // Use the userId passed from useEffect
+      
       const data = await reservationService.getUserReservations(userId);
       setReservations(data);
     } catch (error) {
@@ -58,7 +56,7 @@ export default function ReservationsPage() {
       await reservationService.returnBook(reservationId);
       setMessage({ type: 'success', text: 'Book returned successfully!' });
       
-      // Refresh the list using the current user.id
+      
       if (user && user.id) {
           fetchReservations(user.id);
       }
@@ -67,10 +65,10 @@ export default function ReservationsPage() {
     }
   };
 
-  // While checking auth status, show nothing or loading
+  
   if (!user || isLibrarian) return null;
   
-  // While fetching data, show Loading component
+  
   if (loading) return <Loading />;
 
   return (

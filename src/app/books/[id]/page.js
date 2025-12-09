@@ -11,18 +11,7 @@ import { RESERVATION_DAYS } from '@/utils/constants';
 
 // UI Components & Icons
 import { Button } from "@/components/ui/button";
-import { 
-  ArrowLeft, 
-  Calendar, 
-  BookOpen, 
-  Globe, 
-  Tag, 
-  Barcode, 
-  User, 
-  CheckCircle2, 
-  XCircle,
-  Layers 
-} from "lucide-react";
+import { ArrowLeft, Calendar, BookOpen, Globe, Tag, Barcode, User, CheckCircle2, XCircle,Layers } from "lucide-react";
 
 export default function BookDetailPage() {
   const params = useParams();
@@ -105,14 +94,14 @@ export default function BookDetailPage() {
     ? `http://localhost:8082${book.imageUrl}` 
     : '/images/placeholder-book.png';
 
-  // Helper for status badge styles
+  
   const isAvailable = book.status === 'AVAILABLE';
   const statusColor = isAvailable ? "text-green-700 bg-green-50 border-green-200" : "text-amber-700 bg-amber-50 border-amber-200";
   const StatusIcon = isAvailable ? CheckCircle2 : XCircle;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 animate-in fade-in duration-500">
-      {/* Header / Back Button */}
+      
       <div className="mb-6">
         <Button 
           variant="ghost" 
@@ -124,7 +113,7 @@ export default function BookDetailPage() {
         </Button>
       </div>
 
-      {/* Message Alert */}
+      
       {message.text && (
         <div className={`mb-6 p-4 rounded-lg flex items-center border ${
           message.type === 'success' 
@@ -136,11 +125,11 @@ export default function BookDetailPage() {
         </div>
       )}
 
-      {/* Main Content Card */}
+      
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="grid md:grid-cols-12 gap-0">
           
-          {/* Left Column: Image */}
+          
           <div className="md:col-span-4 lg:col-span-5 bg-gray-50 relative min-h-[400px] md:min-h-full">
             <img
               src={imageUrl}
@@ -150,10 +139,10 @@ export default function BookDetailPage() {
             />
           </div>
 
-          {/* Right Column: Details */}
+          
           <div className="md:col-span-8 lg:col-span-7 p-8 lg:p-10 flex flex-col justify-between">
             <div>
-              {/* Header Info */}
+              
               <div className="flex flex-col gap-4 mb-6">
                 <div className="flex items-start justify-between">
                   <div className={`inline-flex items-center px-3 py-1 rounded-full border text-xs font-semibold tracking-wide uppercase ${statusColor}`}>
@@ -175,7 +164,7 @@ export default function BookDetailPage() {
 
               <div className="h-px bg-gray-100 my-6" />
 
-              {/* Metadata Grid */}
+              
               <div className="grid grid-cols-2 gap-y-6 gap-x-4">
                 {book.category && (
                   <div className="flex items-start space-x-3">

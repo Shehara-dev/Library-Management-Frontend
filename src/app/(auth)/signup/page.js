@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-// 1. Imports for shadcn form & validation
+// Imports for shadcn form & validation
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -21,7 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-// 2. Define Validation Schema
+
 const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
@@ -30,10 +30,10 @@ const formSchema = z.object({
     message: "Password must be at least 6 characters.",
   }),
   confirmPassword: z.string(),
-  role: z.string().default("USER"), // Default role
+  role: z.string().default("USER"), 
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match.",
-  path: ["confirmPassword"], // Error will appear under confirmPassword field
+  path: ["confirmPassword"], 
 });
 
 export default function SignupPage() {
@@ -43,7 +43,7 @@ export default function SignupPage() {
   const { signup } = useAuth();
   const router = useRouter();
 
-  // 3. Initialize Form Hook
+  
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,7 +54,7 @@ export default function SignupPage() {
     },
   });
 
-  // 4. Handle Submit
+  
   const onSubmit = async (values) => {
     setGlobalError('');
     setLoading(true);
@@ -89,18 +89,18 @@ export default function SignupPage() {
           </p>
         </div>
 
-        {/* 5. Shadcn Form Wrapper */}
+       
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             
-            {/* Success Message */}
+            
             {success && (
               <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded-lg text-sm text-center shadow-sm">
                  Account created successfully! Redirecting...
               </div>
             )}
 
-            {/* Error Message */}
+           
             {globalError && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-lg text-sm text-center shadow-sm">
                 {globalError}
@@ -108,7 +108,7 @@ export default function SignupPage() {
             )}
 
             <div className="space-y-4">
-              {/* Email Field */}
+             
               <FormField
                 control={form.control}
                 name="email"
@@ -123,7 +123,7 @@ export default function SignupPage() {
                 )}
               />
 
-              {/* Password Field */}
+              
               <FormField
                 control={form.control}
                 name="password"
@@ -138,7 +138,7 @@ export default function SignupPage() {
                 )}
               />
 
-              {/* Confirm Password Field */}
+              
               <FormField
                 control={form.control}
                 name="confirmPassword"

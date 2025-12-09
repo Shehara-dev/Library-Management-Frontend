@@ -7,13 +7,13 @@ export const reservationService = {
   },
 
   getUserReservations: async (userId) => {
-    // 1. Check if userId is valid before making the request
+    
     if (!userId) {
       console.warn("getUserReservations called without a valid userId."); 
-      return []; // Return an empty array so the UI doesn't crash on .map()
+      return []; 
     }
 
-    // 2. userId exists, proceed with request
+   
     const response = await api.get(`/reservations/user/${userId}`);
     return response.data;
   },

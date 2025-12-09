@@ -11,7 +11,7 @@ export const authService = {
     if (response.data.token) {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify({
-        id: response.data.userId,        // Add this
+        id: response.data.userId,        
         email: response.data.email,
         role: response.data.role
       }));

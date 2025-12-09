@@ -8,7 +8,7 @@ import Loading from '@/components/Loading';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
-// 1. Import Shadcn UI Components
+// import Shadcn UI Components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -62,19 +62,18 @@ export default function BooksPage() {
     }
   };
 
-  // Standard handler for Text Inputs
-  const handleFilterChange = (e) => {
+    const handleFilterChange = (e) => {
     setFilters({
       ...filters,
       [e.target.name]: e.target.value
     });
   };
 
-  // Special handler for Shadcn Select (returns value directly, not event)
+  
   const handleCategoryChange = (value) => {
     setFilters({
       ...filters,
-      category: value === "all" ? "" : value // Handle "all" case
+      category: value === "all" ? "" : value 
     });
   };
 
@@ -106,7 +105,6 @@ export default function BooksPage() {
       genre: '',
       language: ''
     });
-    // We can also trigger a refetch immediately
     fetchBooks(); 
   };
 

@@ -32,7 +32,6 @@ export default function ProfilePage() {
   const fetchUserStats = async () => {
     try {
       setLoading(true);
-      // Note: You'll need to pass the actual user ID
       const reservations = await reservationService.getUserReservations(user.id);
       
       setStats({
@@ -89,7 +88,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* User Statistics (Only for regular users) */}
+      
       {!isLibrarian && (
         <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
           <h3 className="text-lg font-semibold mb-4">My Library Statistics</h3>

@@ -52,16 +52,16 @@ export default function ViewReservationsPage() {
     }
   };
 
-  // Filter reservations
+  
 const filteredReservations = reservations.filter(reservation => {
-  // Filter out librarian reservations - only show USER reservations
+  
   if (reservation.user?.role === 'LIBRARIAN') return false;
 
-  // Filter by status
+  
   if (filter === 'ACTIVE' && reservation.status !== 'ACTIVE') return false;
   if (filter === 'RETURNED' && reservation.status !== 'RETURNED') return false;
 
-  // Filter by search term (user email or book title)
+  
   if (searchTerm) {
     const searchLower = searchTerm.toLowerCase();
     const matchesUser = reservation.user?.email?.toLowerCase().includes(searchLower);
